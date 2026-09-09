@@ -1,4 +1,13 @@
-# 🐍 Python Terminal Mini Projects
+<p align="center">
+  <img src="assets/banner.png" alt="Python Terminal Mini Projects Banner">
+</p>
+
+<h1 align="center">🐍 Python Terminal Mini Projects</h1>
+
+<p align="center">
+  A collection of Python CLI projects built to practice programming,
+  problem-solving, and Python fundamentals.
+</p>
 
 A collection of **small Python-based terminal/command-line projects** created to practice programming fundamentals, problem-solving, logic building, and Python concepts.
 
