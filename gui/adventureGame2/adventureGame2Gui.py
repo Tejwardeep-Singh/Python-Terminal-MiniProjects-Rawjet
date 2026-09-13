@@ -1,102 +1,218 @@
 import tkinter as tk
-from tkinter import messagebox
+import os
+import sys
 
 
 class LastSignalGUI:
     def __init__(self, root):
         self.root = root
         self.root.title("THE LAST SIGNAL")
-        self.root.attributes("-fullscreen", True)
         self.root.configure(bg="#050505")
+        self.root.attributes("-fullscreen", True)
+        self.root.bind("<Escape>", self.leave_fullscreen)
+        self.root.bind("<F11>", self.toggle_fullscreen)
+
         self.name = ""
+        self.is_fullscreen = True
+
+        # Assets are kept in an "assets" folder next to this Python file.
+        # The same helper also works after packaging with PyInstaller.
+        self.base_dir = self.resource_path("")
+        self.logo_path = os.path.join(self.base_dir, "assets", "logo.png")
+        self.ico_path = os.path.join(self.base_dir, "assets", "logo.ico")
+
+        # Windows title/taskbar icon.
+        if os.path.exists(self.ico_path):
+            try:
+                self.root.iconbitmap(self.ico_path)
+            except tk.TclError:
+                pass
+
+        self.logo_image = None
+
+        self.bg = "#050505"
+        self.panel = "#0b0b0b"
+        self.text_color = "#d8d8d8"
+        self.button_bg = "#191919"
+        self.button_active = "#303030"
 
         self.title_font = ("Consolas", 34, "bold")
         self.story_font = ("Consolas", 18)
-        self.button_font = ("Consolas", 16, "bold")
+        self.button_font = ("Consolas", 15, "bold")
 
-        self.title = tk.Label(
-            root, text="THE LAST SIGNAL",
-            font=self.title_font, fg="#d8d8d8", bg="#050505"
+        # Use PLACE instead of pack/expand for the intro so the name box
+        # cannot be pushed off-screen.
+        self.build_intro()
+
+    def resource_path(self, relative_path):
+        """Return an asset path that works both normally and in a PyInstaller EXE."""
+        if getattr(sys, "frozen", False) and hasattr(sys, "_MEIPASS"):
+            base = sys._MEIPASS
+        else:
+            base = os.path.dirname(os.path.abspath(__file__))
+        return os.path.join(base, relative_path)
+
+    def load_logo(self):
+        """Load and scale the PNG logo for the Tkinter header without Pillow."""
+        if not os.path.exists(self.logo_path):
+            return None
+
+        try:
+            image = tk.PhotoImage(file=self.logo_path)
+            max_size = 82
+            factor = max(
+                1,
+                (image.width() + max_size - 1) // max_size,
+                (image.height() + max_size - 1) // max_size
+            )
+            if factor > 1:
+                image = image.subsample(factor, factor)
+            self.logo_image = image
+            return image
+        except tk.TclError:
+            return None
+
+    def leave_fullscreen(self, event=None):
+        self.is_fullscreen = False
+        self.root.attributes("-fullscreen", False)
+        self.root.geometry("1200x800")
+
+    def toggle_fullscreen(self, event=None):
+        self.is_fullscreen = not self.is_fullscreen
+        self.root.attributes("-fullscreen", self.is_fullscreen)
+
+    def destroy_screen(self):
+        for widget in self.root.winfo_children():
+            widget.destroy()
+
+    def make_button(self, parent, text, command):
+        return tk.Button(
+            parent,
+            text=text,
+            command=command,
+            font=self.button_font,
+            fg="#eeeeee",
+            bg=self.button_bg,
+            activebackground=self.button_active,
+            activeforeground="white",
+            relief="flat",
+            bd=0,
+            cursor="hand2",
+            padx=25,
+            pady=12
         )
-        self.title.pack(pady=(45, 20))
 
-        self.story = tk.Text(
-            root, font=self.story_font, fg="#d0d0d0", bg="#0b0b0b",
-            insertbackground="#d0d0d0", relief="flat", wrap="word",
-            padx=35, pady=25
+    def build_intro(self):
+        self.destroy_screen()
+
+        # Logo + title
+        logo = self.load_logo()
+        header = tk.Frame(self.root, bg=self.bg)
+        header.place(relx=0.5, rely=0.09, anchor="center")
+
+        if logo:
+            tk.Label(
+                header, image=logo, bg=self.bg
+            ).pack(side="left", padx=(0, 18))
+
+        tk.Label(
+            header,
+            text="THE LAST SIGNAL",
+            font=self.title_font,
+            fg=self.text_color,
+            bg=self.bg
+        ).pack(side="left")
+
+        # Story panel
+        story_box = tk.Frame(
+            self.root,
+            bg=self.panel,
+            highlightbackground="#151515",
+            highlightthickness=1
         )
-        self.story.pack(fill="both", expand=True, padx=45, pady=10)
-        self.story.config(state="disabled")
-
-        self.buttons = tk.Frame(root, bg="#050505")
-        self.buttons.pack(fill="x", padx=60, pady=(10, 35))
-
-        self.exit_btn = tk.Button(
-            root, text="EXIT", command=self.close,
-            font=("Consolas", 12, "bold"), fg="#aaaaaa", bg="#151515",
-            activebackground="#252525", activeforeground="white",
-            relief="flat", padx=15, pady=7
+        story_box.place(
+            relx=0.5, rely=0.44,
+            relwidth=0.91, relheight=0.48,
+            anchor="center"
         )
-        self.exit_btn.place(relx=0.98, rely=0.02, anchor="ne")
 
-        self.show_intro()
-
-    def clear_buttons(self):
-        for w in self.buttons.winfo_children():
-            w.destroy()
-
-    def write(self, text, clear=False):
-        self.story.config(state="normal")
-        if clear:
-            self.story.delete("1.0", "end")
-        self.story.insert("end", text + "\n\n")
-        self.story.see("end")
-        self.story.config(state="disabled")
-
-    def choices(self, options):
-        self.clear_buttons()
-        for label, command in options:
-            tk.Button(
-                self.buttons, text=label, command=command,
-                font=self.button_font, fg="#eeeeee", bg="#171717",
-                activebackground="#303030", activeforeground="white",
-                relief="flat", bd=0, padx=25, pady=14,
-                cursor="hand2"
-            ).pack(side="left", expand=True, fill="x", padx=8)
-
-    def show_intro(self):
-        self.write(
+        intro = (
             "THE LAST SIGNAL\n"
             "==================================================\n\n"
             "You are about to enter a place that nobody has entered for 15 years.\n"
             "Your mission: Find the source of a mysterious distress signal.\n"
-            "Survive. Find the truth. Get out alive.",
-            clear=True
+            "Survive. Find the truth. Get out alive."
         )
-        self.clear_buttons()
-        entry_frame = tk.Frame(self.buttons, bg="#050505")
-        entry_frame.pack(fill="x")
 
+        story_label = tk.Label(
+            story_box,
+            text=intro,
+            font=self.story_font,
+            fg="#d0d0d0",
+            bg=self.panel,
+            justify="left",
+            anchor="nw"
+        )
+        story_label.place(relx=0.025, rely=0.07, relwidth=0.95, relheight=0.8)
+
+        # THIS IS THE IMPORTANT PART:
+        # The name input is placed explicitly near the bottom of the screen.
         tk.Label(
-            entry_frame, text="ENTER YOUR NAME:",
-            font=("Consolas", 16, "bold"), fg="#aaa", bg="#050505"
-        ).pack(pady=5)
+            self.root,
+            text="ENTER YOUR NAME",
+            font=("Consolas", 15, "bold"),
+            fg="#aaaaaa",
+            bg=self.bg
+        ).place(relx=0.30, rely=0.89, anchor="center")
 
-        name_entry = tk.Entry(
-            entry_frame, font=("Consolas", 18), fg="white", bg="#151515",
-            insertbackground="white", relief="flat", justify="center"
+        self.name_entry = tk.Entry(
+            self.root,
+            font=("Consolas", 17),
+            fg="white",
+            bg="#151515",
+            insertbackground="white",
+            relief="flat",
+            justify="center"
         )
-        name_entry.pack(pady=8, ipadx=10, ipady=8)
-        name_entry.focus_set()
+        self.name_entry.place(
+            relx=0.50, rely=0.89,
+            relwidth=0.27, height=42,
+            anchor="center"
+        )
+        self.name_entry.focus_force()
+        self.name_entry.bind("<Return>", lambda e: self.begin())
 
-        tk.Button(
-            entry_frame, text="BEGIN", command=lambda: self.begin(name_entry),
-            font=self.button_font, fg="white", bg="#252525",
-            activebackground="#404040", relief="flat", padx=45, pady=12
-        ).pack(pady=10)
+        begin = self.make_button(
+            self.root, "BEGIN", self.begin
+        )
+        begin.place(
+            relx=0.70, rely=0.89,
+            relwidth=0.13, height=45,
+            anchor="center"
+        )
 
-    def begin(self, entry):
-        self.name = entry.get().strip() or "Traveler"
+        exit_btn = tk.Button(
+            self.root,
+            text="EXIT",
+            command=self.close,
+            font=("Consolas", 12, "bold"),
+            fg="#aaaaaa",
+            bg="#151515",
+            activebackground="#292929",
+            activeforeground="white",
+            relief="flat",
+            bd=0,
+            padx=18,
+            pady=9,
+            cursor="hand2"
+        )
+        exit_btn.place(relx=0.96, rely=0.035, anchor="center")
+
+    def begin(self, event=None):
+        self.name = self.name_entry.get().strip() or "Traveler"
+
+        self.build_game_screen()
+
         self.write(
             f"Welcome, {self.name}.\n\n"
             "Are you ready to begin?\n\n"
@@ -110,10 +226,132 @@ class LastSignalGUI:
             "The main door slams shut behind you.",
             clear=True
         )
+
         self.choices([
             ("ENTER SECURITY ROOM", self.security_room),
             ("GO TO ELEVATOR", self.elevator)
         ])
+
+    def build_game_screen(self):
+        self.destroy_screen()
+
+        logo = self.load_logo()
+        header = tk.Frame(self.root, bg=self.bg)
+        header.place(relx=0.5, rely=0.08, anchor="center")
+
+        if logo:
+            tk.Label(
+                header, image=logo, bg=self.bg
+            ).pack(side="left", padx=(0, 18))
+
+        tk.Label(
+            header,
+            text="THE LAST SIGNAL",
+            font=self.title_font,
+            fg=self.text_color,
+            bg=self.bg
+        ).pack(side="left")
+
+        tk.Button(
+            self.root,
+            text="EXIT",
+            command=self.close,
+            font=("Consolas", 12, "bold"),
+            fg="#aaaaaa",
+            bg="#151515",
+            activebackground="#292929",
+            activeforeground="white",
+            relief="flat",
+            bd=0,
+            padx=18,
+            pady=9,
+            cursor="hand2"
+        ).place(relx=0.96, rely=0.035, anchor="center")
+
+        self.story_frame = tk.Frame(
+            self.root,
+            bg=self.panel,
+            highlightbackground="#151515",
+            highlightthickness=1
+        )
+        self.story_frame.place(
+            relx=0.5, rely=0.47,
+            relwidth=0.91, relheight=0.69,
+            anchor="center"
+        )
+
+        self.story = tk.Text(
+            self.story_frame,
+            font=self.story_font,
+            fg="#d0d0d0",
+            bg=self.panel,
+            insertbackground="#d0d0d0",
+            selectbackground="#333333",
+            relief="flat",
+            wrap="word",
+            padx=35,
+            pady=25,
+            spacing1=2,
+            spacing3=8
+        )
+        self.story.pack(fill="both", expand=True, padx=2, pady=2)
+        self.story.config(state="disabled")
+
+        # Fixed choice area at bottom.
+        self.buttons = tk.Frame(self.root, bg=self.bg)
+        self.buttons.place(
+            relx=0.5, rely=0.90,
+            relwidth=0.91, relheight=0.13,
+            anchor="center"
+        )
+
+    def clear_buttons(self):
+        for widget in self.buttons.winfo_children():
+            widget.destroy()
+
+    def write(self, text, clear=False):
+        self.story.config(state="normal")
+        if clear:
+            self.story.delete("1.0", "end")
+        self.story.insert("end", text + "\n\n")
+        self.story.see("1.0")
+        self.story.config(state="disabled")
+
+    def choices(self, options):
+        self.clear_buttons()
+        count = len(options)
+
+        for i, (label, command) in enumerate(options):
+            btn = self.make_button(self.buttons, label, command)
+            btn.place(
+                relx=(i + 0.5) / count,
+                rely=0.5,
+                relwidth=(0.94 / count),
+                relheight=0.65,
+                anchor="center"
+            )
+
+    def game_over(self, text):
+        self.write(text + "\n\nGAME OVER.", clear=True)
+        self.end_buttons(False)
+
+    def end_buttons(self, win=False):
+        self.clear_buttons()
+
+        play = self.make_button(
+            self.buttons, "PLAY AGAIN", self.build_intro
+        )
+        play.place(relx=0.35, rely=0.5, relwidth=0.27,
+                   relheight=0.6, anchor="center")
+
+        exit_btn = self.make_button(
+            self.buttons, "EXIT", self.close
+        )
+        exit_btn.place(relx=0.65, rely=0.5, relwidth=0.27,
+                       relheight=0.6, anchor="center")
+
+    def close(self):
+        self.root.destroy()
 
     def security_room(self):
         self.write(
