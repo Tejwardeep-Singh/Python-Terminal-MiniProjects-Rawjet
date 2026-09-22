@@ -8,6 +8,7 @@
 # Chess Board
 # ------------------------------------------
 
+# by Tejwardeep Singh
 
 import sys
 
