@@ -34,22 +34,7 @@ The main goal is to learn Python by building small, functional programs rather t
 
 ---
 
-## 📂 Projects
 
-| #  | Project                 | Description                                      | Concepts                   |
-| -- | ----------------------- | ------------------------------------------------ | -------------------------- |
-| 01 | 🔢 Calculator           | Performs basic mathematical operations           | Functions, Operators       |
-| 02 | 🎲 Number Guessing Game | Guess a randomly generated number                | Loops, Conditions, Random  |
-| 03 | ✊ Rock Paper Scissors   | Play Rock Paper Scissors against the computer    | Conditions, Random         |
-| 04 | 🔐 Password Generator   | Generates random secure passwords                | Strings, Random            |
-| 05 | 📝 To-Do List           | Manage tasks from the terminal                   | Lists, Functions           |
-| 06 | 🎯 Quiz Game            | Answer multiple-choice questions and get a score | Dictionaries, Conditions   |
-| 07 | 💰 Expense Tracker      | Track and manage personal expenses               | Lists, File Handling       |
-| 08 | 📒 Contact Book         | Store and manage contacts                        | Dictionaries, CRUD         |
-| 09 | ⏱️ Countdown Timer      | Runs a countdown in the terminal                 | Time Module, Loops         |
-| 10 | 🎮 Hangman              | Classic word guessing game                       | Strings, Loops, Conditions |
-
-> **Note:** The project list will grow as new mini projects are added.
 
 ---
 
