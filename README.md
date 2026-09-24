@@ -48,41 +48,6 @@ No external frameworks are required for most projects.
 
 ---
 
-## 🚀 Getting Started
-
-### 1. Clone the Repository
-
-```bash
-git clone https://github.com/your-username/python-terminal-mini-projects.git
-```
-
-### 2. Navigate to the Project
-
-```bash
-cd python-terminal-mini-projects
-```
-
-### 3. Run a Project
-
-Navigate to the required project folder:
-
-```bash
-cd calculator
-```
-
-Then run:
-
-```bash
-python main.py
-```
-
-On some systems, you may need:
-
-```bash
-python3 main.py
-```
-
----
 
 ## 🧠 Python Concepts Practiced
 
