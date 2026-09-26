@@ -99,37 +99,7 @@ Depending on the project:
 
 ---
 
-## 💻 Example
 
-A typical project can be executed directly from the terminal:
-
-```bash
-python main.py
-```
-
-Example:
-
-```text
-=========================
-     NUMBER GUESSING
-=========================
-
-Guess a number between 1 and 100:
-
-Enter your guess: 50
-
-Too high!
-
-Enter your guess: 25
-
-Too low!
-
-Enter your guess: 37
-
-🎉 Correct! You guessed the number!
-```
-
----
 
 ## 📈 Learning Progress
 
