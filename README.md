@@ -101,31 +101,7 @@ Depending on the project:
 
 
 
-## 📈 Learning Progress
 
-This repository is also a record of my progress while learning Python.
-
-Projects may become more complex over time as new concepts are introduced.
-
-```text
-Python Basics
-     ↓
-Control Flow
-     ↓
-Functions
-     ↓
-Data Structures
-     ↓
-File Handling
-     ↓
-Exception Handling
-     ↓
-OOP
-     ↓
-Larger CLI Applications
-```
-
----
 
 ## 🔮 Future Improvements
 
