@@ -1,4 +1,5 @@
 # quize game
+# by Tejwardeep Singh
 
 import random
 
